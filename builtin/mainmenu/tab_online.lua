@@ -16,32 +16,17 @@
 --51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 --------------------------------------------------------------------------------
-io.write(" breslin ")
 local function get_formspec(tabview, name, tabdata)
 	-- Update the cached supported proto info,
 	-- it may have changed after a change by the settings menu.
 	common_update_cached_supp_proto()
 
-	if not tabdata.search_for then
-		tabdata.search_for = ""
-	end
-
 	local retval =
-		-- Address / Port
-		"label[7.75,-0.25;" .. fgettext("Address / Port") .. "]" ..
-		"field[8,0.65;3.25,0.5;te_address;;" ..
-			core.formspec_escape(core.settings:get("address")) .. "]" ..
-		"field[11.1,0.65;1.4,0.5;te_port;;" ..
-			core.formspec_escape(core.settings:get("remote_port")) .. "]" ..
-
 		-- Name / Password
 		"label[7.75,0.95;" .. fgettext("Name / Password") .. "]" ..
 		"field[8,1.85;2.9,0.5;te_name;;" ..
 			core.formspec_escape(core.settings:get("name")) .. "]" ..
 		"pwdfield[10.73,1.85;1.77,0.5;te_pwd;]" ..
-
-		-- Description Background
-		"box[7.73,2.25;4.25,2.6;#999999]"..
 
 		-- Connect
 		"button[9.88,4.9;2.3,1;btn_mp_connect;" .. fgettext("Connect") .. "]"
@@ -57,43 +42,14 @@ local function main_button_handler(tabview, fields, name, tabdata)
 		core.settings:set("name", fields.te_name)
 	end
 
-	if fields.key_up or fields.key_down then
-		local fav_idx = core.get_table_index("favourites")
-
-		if fav_idx then
-			if fields.key_up and fav_idx > 1 then
-				fav_idx = fav_idx - 1
-			elseif fields.key_down and fav_idx < #menudata.favorites then
-				fav_idx = fav_idx + 1
-			end
-		else
-			fav_idx = 1
-		end
-
-		local address = fav.address
-		local port    = fav.port
-		gamedata.serverdescription = fav.description
-		if address and port then
-			core.settings:set("address", address)
-			core.settings:set("remote_port", port)
-		end
-
-		tabdata.fav_selected = fav_idx
-		return true
-	end
-
-	if (fields.btn_mp_connect or fields.key_enter)
-			and fields.te_address ~= "" and fields.te_port then
+	if (fields.btn_mp_connect or fields.key_enter) then
 		gamedata.playername = fields.te_name
 		gamedata.password   = fields.te_pwd
-		gamedata.address    = fields.te_address
+		gamedata.address    = "mathcore.org"
 		gamedata.selected_world = 0
 
-		io.write(gamedata.playername)
-		io.write(gamedata.password)
-
-		core.settings:set("address",     fields.te_address)
-		core.settings:set("remote_port", fields.te_port)
+		core.settings:set("address",     gamedata.address)
+		core.settings:set("remote_port", 30000)
 
 		core.start()
 		return true
